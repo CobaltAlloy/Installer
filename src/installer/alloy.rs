@@ -75,7 +75,14 @@ pub async fn patch_daisy_with_alloy(base_path: PathBuf) {
         }
     }
 
-    let output = command.output().await.unwrap();
+    let output_res = command.output().await;
+
+    if let Err(e) = &output_res {
+        println!("Failed to run patch: {}", e);
+        exit_or_windows(4);
+    }
+
+    let output = output_res.unwrap();
 
     let mut stdout = String::from_utf8(output.stdout).unwrap();
 
@@ -105,7 +112,7 @@ Hunk #1 FAILED at 1.
 
     if !base_path.clone().join("daisyMoon/alloy.lua").exists() {
         println!("Patch catastrophically failed! Please open an issue on github.");
-        exit(5);
+        exit_or_windows(5);
     }
 }
 
@@ -132,7 +139,14 @@ pub fn fix_line_endings(base_path: PathBuf) {
     for entry_res in fs::read_dir(base_daisy_path).unwrap() {
         if let Ok(entry) = entry_res {
             if entry.file_name().to_str().unwrap().contains(".lua") {
-                let mut string_content = std::fs::read_to_string(entry.path()).unwrap();
+                let string_content_res = std::fs::read_to_string(entry.path());
+
+                if let Err(e) = &string_content_res {
+                    println!("Failed to read file {}: {}", entry.path().display(), e);
+                    exit_or_windows(3);
+                }
+
+                let mut string_content = string_content_res.unwrap();
 
                 cfg_if! {
                     if #[cfg(target_os = "windows")] {
@@ -143,7 +157,12 @@ pub fn fix_line_endings(base_path: PathBuf) {
                     }
                 }
 
-                std::fs::write(entry.path(), string_content).unwrap();
+                let write_res = std::fs::write(entry.path(), string_content);
+
+                if let Err(e) = write_res {
+                    println!("Failed to read file {}: {}", entry.path().display(), e);
+                    exit_or_windows(3);
+                }
             }
         }
     }
