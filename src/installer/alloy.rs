@@ -51,9 +51,9 @@ pub async fn patch_daisy_with_alloy(base_path: PathBuf) {
 
     #[cfg(target_os = "windows")]
     let diff_command = format!(
-        r#""{}/patch.exe" --ignore-whitespace -p0 -i "{}""#,
-        base_path.display(),
-        diff_path.display()
+        r#""{}" --ignore-whitespace -p0 -i "{}""#,
+        base_path.join("patch.exe").to_str().unwrap(),
+        diff_path.to_str().unwrap()
     );
 
     #[cfg(not(target_os = "windows"))]
