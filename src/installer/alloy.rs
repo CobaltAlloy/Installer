@@ -132,7 +132,7 @@ pub fn fix_line_endings(base_path: PathBuf) {
         }
     }
 
-    std::fs::write(SAVED_DIFF_NAME, alloy_patch).unwrap();
+    std::fs::write(base_path.clone().join(SAVED_DIFF_NAME), alloy_patch).unwrap();
 
     let base_daisy_path = base_path.clone().join("daisyMoon");
 
