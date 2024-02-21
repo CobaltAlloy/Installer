@@ -1,9 +1,11 @@
-use std::{fs, path::PathBuf};
+use std::{fs, path::PathBuf, process::exit};
 
 use cfg_if::cfg_if;
 use newline_converter::{dos2unix, unix2dos};
 use reqwest::Error;
 use tokio::process::Command;
+
+use crate::installer::windows::exit_or_windows;
 
 const TRANSLATIONS_FILE_URL: &str =
     "https://raw.githubusercontent.com/Creeper-boop/Alloy/master/alloy/eng.translations";
@@ -92,18 +94,18 @@ Hunk #1 FAILED at 1.
             println!("stdout: {}", stdout);
             println!("Patch failed because of different line endings, even though we've converted them??");
             println!("Please open an issue on github.");
-            std::process::exit(6);
+            exit_or_windows(6);
         } else {
             println!("stdout: {}", stdout);
             println!("I'm not sure what went wrong");
             println!("Please open an issue on github.");
-            std::process::exit(7);
+            exit_or_windows(7);
         }
     }
 
     if !base_path.clone().join("daisyMoon/alloy.lua").exists() {
         println!("Patch catastrophically failed! Please open an issue on github.");
-        std::process::exit(5);
+        exit(5);
     }
 }
 

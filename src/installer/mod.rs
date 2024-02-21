@@ -3,3 +3,4 @@ pub mod cobalt;
 pub mod google_drive;
 pub mod steam;
 pub mod alloy;
+pub mod windows;

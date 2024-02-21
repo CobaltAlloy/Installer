@@ -8,6 +8,7 @@ use std::path::PathBuf;
 use crate::installer::cobalt::InquireGamePathValidator;
 use crate::installer::cobalt::InquirePathDoesntExistValidator;
 use crate::installer::cobalt::InquirePathExistsValidator;
+use crate::installer::windows::exit_or_windows;
 
 pub mod installer;
 
@@ -123,7 +124,7 @@ async fn main() {
 
         install_dir = Some(copy_dir);
     }
-    
+
     println!("");
     println!("One last thing, I need a decompiled daisyMoon folder.");
     println!("You can either decompile it yourself or you can download it from the Cobalt Archive");
@@ -161,14 +162,13 @@ async fn main() {
                 copy_inside: true,
                 content_only: true,
                 overwrite: true, // We might be copying an entire daisyMoon folder from another
-                                 // Alloy install
+                // Alloy install
                 ..Default::default()
             };
 
             fs_extra::dir::copy(path, daisy_path.clone(), &options).unwrap();
 
             daisymoon_folder_path = Some(daisy_path);
-
         } else if let Some(extension) = path.extension() {
             if extension != "zip" {
                 println!("That path is not a folder or zip, please try again.");
@@ -185,12 +185,17 @@ async fn main() {
             for i in 0..archive.len() {
                 let mut file = archive.by_index(i).expect("Failed zip crawl");
 
-                let name = file.enclosed_name().unwrap().to_str().unwrap().replace("daisyMoon/", "");
+                let name = file
+                    .enclosed_name()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .replace("daisyMoon/", "");
 
                 let outpath = install_dir.clone().unwrap().join("daisyMoon").join(name);
 
                 std::fs::create_dir_all(outpath.clone().parent().unwrap()).unwrap();
-                
+
                 let mut outfile = File::create(&outpath).unwrap();
                 std::io::copy(&mut file, &mut outfile).unwrap();
             }
@@ -228,8 +233,13 @@ async fn main() {
 
     println!("Running patch command..");
     installer::alloy::patch_daisy_with_alloy(install_dir.clone().unwrap()).await;
-    
+
     println!("");
     println!("{}", "Successfully installed Alloy!".bold());
-    println!("Add {} to Steam as a non-steam game and enjoy! :D", install_dir.unwrap().join("cobaltDM.exe").display());
+    println!(
+        "Add {} to Steam as a non-steam game and enjoy! :D",
+        install_dir.unwrap().join("cobaltDM.exe").display()
+    );
+
+    exit_or_windows(0);
 }
