@@ -10,11 +10,11 @@ use tokio::process::Command;
 use crate::installer::windows::exit_or_windows;
 
 const TRANSLATIONS_FILE_URL: &str =
-    "https://raw.githubusercontent.com/Creeper-boop/Alloy/master/alloy/eng.translations";
+    "https://raw.githubusercontent.com/CobaltAlloy/Alloy/master/alloy/eng.translations";
 #[allow(dead_code)]
-const LATEST_WINDOWS_DIFF_URL: &str = "https://raw.githubusercontent.com/Creeper-boop/Alloy/master/alloy/win/alloy_editor_mod_0_0_3_win.diff";
+const LATEST_WINDOWS_DIFF_URL: &str = "https://raw.githubusercontent.com/CobaltAlloy/Alloy/master/alloy/win/alloy_editor_mod_0_0_3_win.diff";
 #[allow(dead_code)]
-const LATEST_LINUX_DIFF_URL: &str = "https://raw.githubusercontent.com/Creeper-boop/Alloy/master/alloy/lin/alloy_editor_mod_0_0_3_lin.diff";
+const LATEST_LINUX_DIFF_URL: &str = "https://raw.githubusercontent.com/CobaltAlloy/Alloy/master/alloy/lin/alloy_editor_mod_0_0_3_lin.diff";
 
 /// The name of the diff saved when downloading
 const SAVED_DIFF_NAME: &str = "alloy_editor_mod.diff";
