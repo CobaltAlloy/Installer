@@ -61,6 +61,8 @@ pub async fn patch_daisy_with_alloy(base_path: PathBuf) {
         r#"patch --ignore-whitespace -p0 < "{}""#,
         diff_path.display()
     );
+    
+    println!("Patch command: {:?}", diff_command.clone());
 
     cfg_if! {
         if #[cfg(target_os = "windows")] {
