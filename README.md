@@ -2,6 +2,8 @@
 
 Automatic installer for [the Alloy modloader](https://github.com/CobaltAlloy/Alloy).
 
+Designed to support Windows and Linux.
+
 ## Regular usage
 
 Go to the [Releases tab](https://github.com/CobaltAlloy/Installer/releases) and download
