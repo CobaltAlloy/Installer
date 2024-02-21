@@ -5,9 +5,10 @@ use std::io::Read;
 pub fn exit_or_windows(code: i32) {
     cfg_if! {
         if #[cfg(target_os = "windows")] {
-           let mut stdin = std::io::stdin();
             
-            print!("Press enter to exit.. (code {})", code);
+            println!("Press enter to exit.. (code {})", code);
+
+           let mut stdin = std::io::stdin(); 
 
             let _ = stdin.read(&mut [0u8]).unwrap();
         }

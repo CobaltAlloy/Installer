@@ -111,6 +111,7 @@ Hunk #1 FAILED at 1.
     }
 
     if !base_path.clone().join("daisyMoon/alloy.lua").exists() {
+        println!("stdout: {}", stdout);
         println!("Patch catastrophically failed! Please open an issue on github.");
         exit_or_windows(5);
     }
