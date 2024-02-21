@@ -249,7 +249,7 @@ async fn main() {
         if #[cfg(target_os = "windows")] {
             println!("Since you're running windows, I'll need to download patch.exe");
 
-            let mut sp = Spinner::new(Spinners::Dots, "Downloading patch..");
+            let mut sp = Spinner::new(Spinners::Dots, "Downloading patch..".into());
 
             let patch_dl_result = installer::gnuwin32::get_win32_patch(install_dir.clone().unwrap()).await;
             if let Err(e) = patch_dl_result {
