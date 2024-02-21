@@ -253,7 +253,7 @@ async fn main() {
 
             let patch_dl_result = installer::gnuwin32::get_win32_patch(install_dir.clone().unwrap()).await;
             if let Err(e) = patch_dl_result {
-                println!("Failed to download patch with error: {}", patch_dl_result);
+                println!("Failed to download patch with error: {}", e);
                 println!("Are you connected to the internet?");
                 exit_or_windows(2);
             }
