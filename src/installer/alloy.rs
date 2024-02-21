@@ -51,9 +51,8 @@ pub async fn patch_daisy_with_alloy(base_path: PathBuf) {
 
     #[cfg(target_os = "windows")]
     let diff_command = format!(
-        r#""{}" --ignore-whitespace -p0 -i "{}""#,
-        base_path.join("patch.exe").display(),
-        diff_path.display()
+        ".\\patch.exe --ignore-whitespace -p0 -i .\\{}",
+        SAVED_DIFF_NAME
     );
 
     #[cfg(not(target_os = "windows"))]
