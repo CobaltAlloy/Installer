@@ -1,6 +1,9 @@
 use std::path::PathBuf;
 
-use inquire::{validator::{Validation, StringValidator}, CustomUserError};
+use inquire::{
+    validator::{StringValidator, Validation},
+    CustomUserError,
+};
 
 pub const STEAM_RELATIVE_PATH: &str = "steamapps/common/Cobalt";
 
@@ -53,79 +56,4 @@ fn search_for_cobalt_in(steam_dir: PathBuf) -> Option<PathBuf> {
     }
 
     return None;
-}
-
-/// Enquire validator to ensure the path is a valid cobalt install
-#[derive(Clone)]
-pub struct InquireGamePathValidator {}
-
-impl InquireGamePathValidator {
-    fn validate_path(&self, path: String) -> Result<Validation, CustomUserError> {
-            let pathbuf: PathBuf = path.into();
-
-            if !pathbuf.exists() {
-                return Ok(Validation::Invalid("That path doesn't exist.".into()));
-            }
-
-            let exe_path = pathbuf.join("cobalt.exe");
-            if !exe_path.exists() {
-                return Ok(Validation::Invalid("That path doesn't contain cobalt.exe.".into()));
-            }
-
-            return Ok(Validation::Valid);
-    }
-    
-}
-
-impl StringValidator for InquireGamePathValidator {
-    fn validate(&self, input: &str) -> Result<Validation, CustomUserError> {
-       self.validate_path(input.to_string()) 
-    }
-}
-
-/// Enquire validator to ensure the path doesn't already exist
-#[derive(Clone)]
-pub struct InquirePathDoesntExistValidator {}
-
-impl InquirePathDoesntExistValidator {
-    fn validate_path(&self, path: String) -> Result<Validation, CustomUserError> {
-            let pathbuf: PathBuf = path.into();
-
-            if !pathbuf.exists() {
-                return Ok(Validation::Valid);
-            }
-
-            return Ok(Validation::Invalid("That path already exists.".into()));
-    }
-    
-}
-
-impl StringValidator for InquirePathDoesntExistValidator {
-    fn validate(&self, input: &str) -> Result<Validation, CustomUserError> {
-       self.validate_path(input.to_string()) 
-    }
-}
-
-
-/// Enquire validator to ensure the path exists
-#[derive(Clone)]
-pub struct InquirePathExistsValidator {}
-
-impl InquirePathExistsValidator {
-    fn validate_path(&self, path: String) -> Result<Validation, CustomUserError> {
-            let pathbuf: PathBuf = path.into();
-
-            if pathbuf.exists() {
-                return Ok(Validation::Valid);
-            }
-
-            return Ok(Validation::Invalid("That path doesn't exist".into()));
-    }
-    
-}
-
-impl StringValidator for InquirePathExistsValidator {
-    fn validate(&self, input: &str) -> Result<Validation, CustomUserError> {
-       self.validate_path(input.to_string()) 
-    }
 }

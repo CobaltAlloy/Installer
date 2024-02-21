@@ -1,6 +1,8 @@
-use std::{fs, path::PathBuf, process::exit};
+use std::{fs, path::PathBuf};
 
 use cfg_if::cfg_if;
+
+#[allow(unused_imports)]
 use newline_converter::{dos2unix, unix2dos};
 use reqwest::Error;
 use tokio::process::Command;
@@ -9,7 +11,9 @@ use crate::installer::windows::exit_or_windows;
 
 const TRANSLATIONS_FILE_URL: &str =
     "https://raw.githubusercontent.com/Creeper-boop/Alloy/master/alloy/eng.translations";
+#[allow(dead_code)]
 const LATEST_WINDOWS_DIFF_URL: &str = "https://raw.githubusercontent.com/Creeper-boop/Alloy/master/alloy/win/alloy_editor_mod_0_0_3_win.diff";
+#[allow(dead_code)]
 const LATEST_LINUX_DIFF_URL: &str = "https://raw.githubusercontent.com/Creeper-boop/Alloy/master/alloy/lin/alloy_editor_mod_0_0_3_lin.diff";
 
 /// The name of the diff saved when downloading
@@ -60,8 +64,6 @@ pub async fn patch_daisy_with_alloy(base_path: PathBuf) {
         r#"patch --ignore-whitespace -p0 < "{}""#,
         diff_path.display()
     );
-    
-    println!("Patch command: {}", diff_command.clone());
 
     cfg_if! {
         if #[cfg(target_os = "windows")] {
@@ -91,9 +93,12 @@ pub async fn patch_daisy_with_alloy(base_path: PathBuf) {
     // launcher.lua with one single print.
     //
     // Why does this happen? Idk, but it isn't *that* important
-    stdout = stdout.replace("patching file daisyMoon/launcher.lua
+    stdout = stdout.replace(
+        "patching file daisyMoon/launcher.lua
 Hunk #1 FAILED at 1.
-1 out of 1 hunk FAILED -- saving rejects to file daisyMoon/launcher.lua.rej", "");
+1 out of 1 hunk FAILED -- saving rejects to file daisyMoon/launcher.lua.rej",
+        "",
+    );
 
     let stderr = String::from_utf8(output.stderr).unwrap();
 
@@ -103,7 +108,9 @@ Hunk #1 FAILED at 1.
         if stdout.contains("different line endings") {
             println!("stdout: {}", stdout);
             println!("stderr: {}", stderr);
-            println!("Patch failed because of different line endings, even though we've converted them??");
+            println!(
+                "Patch failed because of different line endings, even though we've converted them"
+            );
             println!("Please open an issue on github.");
             exit_or_windows(6);
         } else {
@@ -118,6 +125,7 @@ Hunk #1 FAILED at 1.
     if !base_path.clone().join("daisyMoon/alloy.lua").exists() {
         println!("stdout: {}", stdout);
         println!("stderr: {}", stderr);
+        println!("Patch command: {}", diff_command.clone());
         println!("Patch catastrophically failed! Please open an issue on github.");
         exit_or_windows(5);
     }
@@ -125,7 +133,6 @@ Hunk #1 FAILED at 1.
 
 // Just in case, fix all the line endings for all files before patching
 pub fn fix_line_endings(base_path: PathBuf) {
-
     let diff_path = base_path.clone().join(SAVED_DIFF_NAME);
 
     let mut alloy_patch = std::fs::read_to_string(diff_path).unwrap();

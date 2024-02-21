@@ -1,5 +1,7 @@
 use std::{fs::File, io::Cursor, path::PathBuf};
 
+use crate::installer::windows::exit_or_windows;
+
 const GNU_WIN32_BIN_DOWNLOAD_URL: &str = "https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip?ts=gAAAAABl1FheHDGGDzMdv7y0yCJdSoon2i65z-NnrIuL-odvU4C8HmSRl8Xk3W9-bE-k11VZQPDoTjJKQEGbkGuVXPOu3p_ewQ%3D%3D&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fgnuwin32%2Ffiles%2Fpatch%2F2.5.9-7%2Fpatch-2.5.9-7-bin.zip%2Fdownload%3Fuse_mirror%3Dnetix%26download%3D";
 
 /// Installs gnuwin32 patch.exe into the path
@@ -9,9 +11,7 @@ pub async fn get_win32_patch(base_path: PathBuf) -> Result<(), reqwest::Error> {
         .get(GNU_WIN32_BIN_DOWNLOAD_URL)
         .send()
         .await?;
-    let zip_bytes = result
-        .bytes()
-        .await?;
+    let zip_bytes = result.bytes().await?;
 
     let cursor = Cursor::new(zip_bytes);
 
@@ -33,5 +33,7 @@ pub async fn get_win32_patch(base_path: PathBuf) -> Result<(), reqwest::Error> {
         }
     }
 
-    unreachable!("Downloaded patch.zip did not have patch.exe, what?");
+    println!("Downloaded patch.zip did not have patch.exe, what?");
+    exit_or_windows(55);
+    unreachable!();
 }

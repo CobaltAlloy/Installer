@@ -103,7 +103,7 @@ pub async fn index_folder(id: String) -> Result<DriveListResponse, reqwest::Erro
 
     if is_error {
         println!("An error occurred: {}", json_body);
-    } 
+    }
 
     let deserialized_response: DriveListResponse = serde_json::from_str(&json_body).unwrap();
 

@@ -1,13 +1,15 @@
 use cfg_if::cfg_if;
 use colored::Colorize;
 use fs_extra::dir::CopyOptions;
+use spinners::{Spinner, Spinners};
 use std::fs::File;
 use std::io::Cursor;
 use std::path::PathBuf;
 
-use crate::installer::cobalt::InquireGamePathValidator;
-use crate::installer::cobalt::InquirePathDoesntExistValidator;
-use crate::installer::cobalt::InquirePathExistsValidator;
+use crate::installer::inquire::FilePathCompleter;
+use crate::installer::inquire::InquireGamePathValidator;
+use crate::installer::inquire::InquirePathDoesntExistValidator;
+use crate::installer::inquire::InquirePathExistsValidator;
 use crate::installer::windows::exit_or_windows;
 
 pub mod installer;
@@ -30,7 +32,7 @@ async fn main() {
     if let Some(dir) = cobalt_directory_found {
         let prompt = format!("Found Cobalt at {}, is that right?", dir.display());
         let confirm = inquire::Confirm::new(&prompt).with_default(true).prompt();
-        if confirm.expect("Invalid input") {
+        if confirm.expect("Cancelled") {
             cobalt_dir = Some(dir);
         }
     }
@@ -40,6 +42,7 @@ async fn main() {
 
         let path = inquire::Text::new(prompt)
             .with_validator(InquireGamePathValidator {})
+            .with_autocomplete(FilePathCompleter::default())
             .prompt()
             .unwrap();
         cobalt_dir = Some(path.into());
@@ -105,12 +108,14 @@ async fn main() {
             let prompt = "Okay, where should I create a new copy then?";
             copy_dir = inquire::Text::new(prompt)
                 .with_validator(InquirePathDoesntExistValidator {})
+                .with_autocomplete(FilePathCompleter::default())
                 .prompt()
                 .unwrap()
                 .into();
         }
 
-        println!("Creating a new copy of Cobalt at {}..", copy_dir.display());
+        let msg = format!("Creating a new copy of Cobalt at {}..", copy_dir.display());
+        let mut sp = Spinner::new(Spinners::Dots, msg);
 
         std::fs::create_dir_all(copy_dir.clone()).unwrap();
 
@@ -121,6 +126,11 @@ async fn main() {
         };
 
         fs_extra::dir::copy(cobalt_dir.clone().unwrap(), copy_dir.clone(), &options).unwrap();
+
+        sp.stop_with_message(format!(
+            "Created new copy of cobalt at {}!",
+            copy_dir.display()
+        ));
 
         install_dir = Some(copy_dir);
     }
@@ -139,6 +149,7 @@ async fn main() {
     while daisymoon_folder_path.is_none() {
         let path: PathBuf = inquire::Text::new("daisyMoon path (.zip or folder)")
             .with_validator(InquirePathExistsValidator {})
+            .with_autocomplete(FilePathCompleter::default())
             .prompt()
             .unwrap()
             .into();
@@ -154,6 +165,8 @@ async fn main() {
                 continue;
             }
 
+            let mut sp = Spinner::new(Spinners::Dots, "Creating daisyMoon folder..".into());
+
             let daisy_path = install_dir.clone().unwrap().join("daisyMoon");
 
             std::fs::create_dir_all(daisy_path.clone()).unwrap();
@@ -168,12 +181,16 @@ async fn main() {
 
             fs_extra::dir::copy(path, daisy_path.clone(), &options).unwrap();
 
+            sp.stop_with_message("Created daisyMoon folder!".into());
+
             daisymoon_folder_path = Some(daisy_path);
         } else if let Some(extension) = path.extension() {
             if extension != "zip" {
                 println!("That path is not a folder or zip, please try again.");
                 continue;
             }
+
+            let mut sp = Spinner::new(Spinners::Dots, "Creating daisyMoon folder..".into());
 
             let bytes = std::fs::read(path).unwrap();
 
@@ -190,6 +207,8 @@ async fn main() {
                     .unwrap()
                     .to_str()
                     .unwrap()
+                    .replace("cobalt/", "") // Fix potentially downloading it as a zip from the
+                    // wrong folders
                     .replace("daisyMoon/", "");
 
                 let outpath = install_dir.clone().unwrap().join("daisyMoon").join(name);
@@ -200,6 +219,8 @@ async fn main() {
                 std::io::copy(&mut file, &mut outfile).unwrap();
             }
 
+            sp.stop_with_message("Created daisyMoon folder!".into());
+
             daisymoon_folder_path = Some(install_dir.clone().unwrap().join("daisyMoon"));
         } else {
             println!("That path is not a folder or zip, please try again.");
@@ -207,31 +228,48 @@ async fn main() {
         }
     }
 
-    println!("Successfully created daisyMoon folder!");
-    println!("");
     println!("Installing to {}..", install_dir.clone().unwrap().display());
 
-    println!("Creating appid...");
     installer::steam::create_app_id_txt(install_dir.clone().unwrap()).await;
+    println!("Created appid!");
 
-    println!("Downloading Alloy..");
-    installer::alloy::download_alloy_files(install_dir.clone().unwrap())
-        .await
-        .unwrap();
+    let mut sp = Spinner::new(Spinners::Dots, "Downloading Aloy..".into());
+
+    let alloy_dl_result =
+        installer::alloy::download_alloy_files(install_dir.clone().unwrap()).await;
+    if let Err(e) = alloy_dl_result {
+        println!("Failed to download Alloy with error: {}", e);
+        println!("Are you connected to the internet?");
+        exit_or_windows(2);
+    }
+
+    sp.stop_with_message("Downloaded Alloy!".into());
 
     cfg_if! {
         if #[cfg(target_os = "windows")] {
-            println!("Since you're running windows, I'll need to install patch.exe");
-            installer::gnuwin32::get_win32_patch(install_dir.clone().unwrap()).await.unwrap();
-            println!("Installed!");
+            println!("Since you're running windows, I'll need to download patch.exe");
+
+            let mut sp = Spinner::new(Spinners::Dots, "Downloading patch..");
+
+            let patch_dl_result = installer::gnuwin32::get_win32_patch(install_dir.clone().unwrap()).await;
+            if let Err(e) = patch_dl_result {
+                println!("Failed to download patch with error: {}", patch_dl_result);
+                println!("Are you connected to the internet?");
+                exit_or_windows(2);
+            }
+
+            sp.stop_with_message("Downloaded!".into());
         }
     }
 
-    println!("Just in case, syncing line endings before running patch..");
+    let mut sp = Spinner::new(
+        Spinners::Dots,
+        "Syncing line endings with your system..".into(),
+    );
     installer::alloy::fix_line_endings(install_dir.clone().unwrap());
-    println!("Done!");
+    sp.stop_with_message("Synced line endings!".into());
 
-    println!("Running patch command..");
+    println!("Running patch!");
     installer::alloy::patch_daisy_with_alloy(install_dir.clone().unwrap()).await;
 
     println!("");
