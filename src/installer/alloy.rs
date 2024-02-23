@@ -9,6 +9,8 @@ use tokio::process::Command;
 
 use crate::installer::windows::exit_or_windows;
 
+use super::INSTALLER_FOLDER;
+
 const TRANSLATIONS_FILE_URL: &str =
     "https://raw.githubusercontent.com/CobaltAlloy/Alloy/master/alloy/eng.translations";
 #[allow(dead_code)]
@@ -17,7 +19,7 @@ const LATEST_WINDOWS_DIFF_URL: &str = "https://raw.githubusercontent.com/CobaltA
 const LATEST_LINUX_DIFF_URL: &str = "https://raw.githubusercontent.com/CobaltAlloy/Alloy/master/alloy/lin/alloy_editor_mod_0_0_3_lin.diff";
 
 /// The name of the diff saved when downloading
-const SAVED_DIFF_NAME: &str = "alloy_editor_mod.diff";
+pub const SAVED_DIFF_NAME: &str = "alloy_editor_mod.diff";
 
 /// Downloads the required alloy files into the right folders
 pub async fn download_alloy_files(base_path: PathBuf) -> Result<(), Error> {
@@ -44,18 +46,20 @@ pub async fn download_alloy_files(base_path: PathBuf) -> Result<(), Error> {
 
     let diff = client.get(diff_url).send().await?.bytes().await?;
 
-    std::fs::write(base_path.join(SAVED_DIFF_NAME), diff).unwrap();
+    std::fs::write(base_path.join(INSTALLER_FOLDER).join(SAVED_DIFF_NAME), diff).unwrap();
 
     Ok(())
 }
 
 /// Runs the patch command for the downloaded diff
 pub async fn patch_daisy_with_alloy(base_path: PathBuf) {
-    let diff_path = base_path.clone().join(SAVED_DIFF_NAME);
+    let diff_path = base_path.clone().join(INSTALLER_FOLDER).join(SAVED_DIFF_NAME);
 
     #[cfg(target_os = "windows")]
     let diff_command = format!(
-        ".\\patch.exe --ignore-whitespace -p0 -i .\\{}",
+        ".\\{}\\patch.exe --ignore-whitespace -p0 -i .\\{}\\{}",
+        INSTALLER_FOLDER,
+        INSTALLER_FOLDER,
         SAVED_DIFF_NAME
     );
 

@@ -1,6 +1,6 @@
 use std::{fs::File, io::Cursor, path::PathBuf};
 
-use crate::installer::windows::exit_or_windows;
+use crate::installer::{windows::exit_or_windows, INSTALLER_FOLDER};
 
 const GNU_WIN32_BIN_DOWNLOAD_URL: &str = "https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip?ts=gAAAAABl1FheHDGGDzMdv7y0yCJdSoon2i65z-NnrIuL-odvU4C8HmSRl8Xk3W9-bE-k11VZQPDoTjJKQEGbkGuVXPOu3p_ewQ%3D%3D&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fgnuwin32%2Ffiles%2Fpatch%2F2.5.9-7%2Fpatch-2.5.9-7-bin.zip%2Fdownload%3Fuse_mirror%3Dnetix%26download%3D";
 
@@ -24,7 +24,7 @@ pub async fn get_win32_patch(base_path: PathBuf) -> Result<(), reqwest::Error> {
         let name = file.enclosed_name().unwrap().to_str().unwrap();
 
         if name == "bin/patch.exe" {
-            let outpath = base_path.join("patch.exe");
+            let outpath = base_path.join(INSTALLER_FOLDER).join("patch.exe");
 
             let mut outfile = File::create(&outpath).unwrap();
             std::io::copy(&mut file, &mut outfile).unwrap();
