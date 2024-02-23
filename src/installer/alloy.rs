@@ -137,9 +137,9 @@ Hunk #1 FAILED at 1.
 
 // Just in case, fix all the line endings for all files before patching
 pub fn fix_line_endings(base_path: PathBuf) {
-    let diff_path = base_path.clone().join(SAVED_DIFF_NAME);
+    let diff_path = base_path.clone().join(INSTALLER_FOLDER).join(SAVED_DIFF_NAME);
 
-    let mut alloy_patch = std::fs::read_to_string(diff_path).unwrap();
+    let mut alloy_patch = std::fs::read_to_string(diff_path.clone()).unwrap();
 
     cfg_if! {
         if #[cfg(target_os = "windows")] {
@@ -150,7 +150,7 @@ pub fn fix_line_endings(base_path: PathBuf) {
         }
     }
 
-    std::fs::write(base_path.clone().join(SAVED_DIFF_NAME), alloy_patch).unwrap();
+    std::fs::write(diff_path, alloy_patch).unwrap();
 
     let base_daisy_path = base_path.clone().join("daisyMoon");
 
