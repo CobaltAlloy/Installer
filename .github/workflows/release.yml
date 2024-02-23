@@ -1,25 +1,31 @@
 # .github/workflows/release.yml
+name: Release
 
 on:
   release:
     types: [created]
 
 jobs:
-  release:
-    name: release ${{ matrix.target }}
-    runs-on: ubuntu-latest
+  release-windows:
+    name: release x86_64-pc-windows-msvc
+    runs-on: windows-latest
     strategy:
       fail-fast: false
-      matrix:
-        target: [x86_64-pc-windows-gnu]
     steps:
       - uses: actions/checkout@v4
-      - name: Compile and release
-        uses: rust-build/rust-build.action@v1.4.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
         with:
-          RUSTTARGET: ${{ matrix.target }}
+          cache-all-crates: "true"
+      - name: Compile
+        run: cargo build --release
+      - name: Upload release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/release/alloy-installer.exe
+          asset_name: Installer_${{ github.ref }}_x64_64-pc-windows-msvc
+          tag: ${{ github.ref }}
 
   release-linux:
     name: release x86_64-unknown-linux-gnu

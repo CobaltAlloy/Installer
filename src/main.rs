@@ -11,6 +11,7 @@ use crate::installer::inquire::InquireGamePathValidator;
 use crate::installer::inquire::InquirePathDoesntExistValidator;
 use crate::installer::inquire::InquirePathExistsValidator;
 use crate::installer::windows::exit_or_windows;
+use crate::installer::INSTALLER_FOLDER;
 
 pub mod installer;
 
@@ -133,7 +134,7 @@ async fn main() {
         ));
 
         install_dir = Some(copy_dir);
-    }
+    } 
 
     println!("");
     println!("One last thing, I need a decompiled daisyMoon folder.");
@@ -174,8 +175,7 @@ async fn main() {
             let options = CopyOptions {
                 copy_inside: true,
                 content_only: true,
-                overwrite: true, // We might be copying an entire daisyMoon folder from another
-                // Alloy install
+                overwrite: true, // We might be copying an entire daisyMoon folder from another alloy install
                 ..Default::default()
             };
 
@@ -207,8 +207,7 @@ async fn main() {
                     .unwrap()
                     .to_str()
                     .unwrap()
-                    .replace("cobalt/", "") // Fix potentially downloading it as a zip from the
-                    // wrong folders
+                    .replace("cobalt/", "") // Fix potentially downloading it as a zip from the wrong folders
                     .replace("daisyMoon/", "");
 
                 let outpath = install_dir.clone().unwrap().join("daisyMoon").join(name);
@@ -234,6 +233,11 @@ async fn main() {
     println!("Created appid!");
 
     let mut sp = Spinner::new(Spinners::Dots, "Downloading Aloy..".into());
+
+    if let Err(e) = std::fs::create_dir_all(install_dir.clone().unwrap().join(INSTALLER_FOLDER)) {
+        println!("Failed to create installer file directory: {}", e);
+        exit_or_windows(102);
+    }
 
     let alloy_dl_result =
         installer::alloy::download_alloy_files(install_dir.clone().unwrap()).await;
@@ -271,7 +275,17 @@ async fn main() {
 
     println!("Running patch!");
     installer::alloy::patch_daisy_with_alloy(install_dir.clone().unwrap()).await;
-
+    println!("Successfully patched!");
+    
+    println!("Writing metadata to make future updating easier..");
+    installer::metadata::write_metadata(install_dir.clone().unwrap());
+    println!("Done!");
+    
+    if let Err(e) = std::fs::create_dir_all(install_dir.clone().unwrap().join("alloys")) {
+        println!("Failed to create alloys directory: {}", e);
+        exit_or_windows(99);
+    }
+    
     println!("");
     println!("{}", "Successfully installed Alloy!".bold());
     println!(

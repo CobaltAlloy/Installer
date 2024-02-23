@@ -1,4 +1,6 @@
 # .github/workflows/check.yml
+name: Check
+
 on: [push]
 
 jobs:
