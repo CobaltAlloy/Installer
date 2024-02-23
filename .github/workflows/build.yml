@@ -5,7 +5,7 @@ on: workflow_dispatch
 
 jobs:
   build-windows:
-    name: build x86_64-pc-windows-gnu
+    name: build x86_64-pc-windows-msvc
     runs-on: windows-latest
     strategy:
       fail-fast: false
@@ -20,7 +20,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: x86_64-pc-windows-gnu binary
+          name: x86_64-pc-windows-msvc binary
           path: target/release/alloy-installer.exe
 
 
