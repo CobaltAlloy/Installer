@@ -24,7 +24,7 @@ impl InstallMetadata {
     /// Creates install metadata valid for this version of the installer.
     pub fn new() -> InstallMetadata {
         let installer_version = env!("CARGO_PKG_VERSION").to_string();
-        Self { alloy_version: "0.3.0".to_string(), installer_version, diff_file: SAVED_DIFF_NAME.to_string() }
+        Self { alloy_version: "0.0.3".to_string(), installer_version, diff_file: SAVED_DIFF_NAME.to_string() }
     }
 }
 
