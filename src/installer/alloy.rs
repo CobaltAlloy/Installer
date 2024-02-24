@@ -14,9 +14,9 @@ use super::INSTALLER_FOLDER;
 const TRANSLATIONS_FILE_URL: &str =
     "https://raw.githubusercontent.com/CobaltAlloy/Alloy/master/alloy/eng.translations";
 #[allow(dead_code)]
-const LATEST_WINDOWS_DIFF_URL: &str = "https://raw.githubusercontent.com/CobaltAlloy/Alloy/master/alloy/win/alloy_editor_mod_0_0_3_win.diff";
+const LATEST_WINDOWS_DIFF_URL: &str = "https://raw.githubusercontent.com/CobaltAlloy/Alloy/master/alloy/win/alloy_editor_mod_0_0_4_win.diff";
 #[allow(dead_code)]
-const LATEST_LINUX_DIFF_URL: &str = "https://raw.githubusercontent.com/CobaltAlloy/Alloy/master/alloy/lin/alloy_editor_mod_0_0_3_lin.diff";
+const LATEST_LINUX_DIFF_URL: &str = "https://raw.githubusercontent.com/CobaltAlloy/Alloy/master/alloy/lin/alloy_editor_mod_0_0_4_lin.diff";
 
 /// The name of the diff saved when downloading
 pub const SAVED_DIFF_NAME: &str = "alloy_editor_mod.diff";
