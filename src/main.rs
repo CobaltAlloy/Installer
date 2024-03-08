@@ -6,6 +6,10 @@ use std::fs::File;
 use std::io::Cursor;
 use std::path::PathBuf;
 
+//I'm not sure where to add this, but Windows builds don't have a .exe at the end. They run fine if you add it manually, however
+// std::env::consts::EXE_SUFFIX
+//Source: https://stackoverflow.com/questions/40917780/how-to-get-the-executable-extension-across-platforms-in-rust
+
 use crate::installer::inquire::FilePathCompleter;
 use crate::installer::inquire::InquireGamePathValidator;
 use crate::installer::inquire::InquirePathDoesntExistValidator;
@@ -74,7 +78,7 @@ async fn main() {
     let mut install_dir: Option<PathBuf> = None;
 
     if !create_new_copy {
-        println!("Okay, if you say so..");
+        println!("Okay, if you say so...");
         install_dir = cobalt_dir.clone();
     }
 
@@ -115,7 +119,7 @@ async fn main() {
                 .into();
         }
 
-        let msg = format!("Creating a new copy of Cobalt at {}..", copy_dir.display());
+        let msg = format!("Creating a new copy of Cobalt at {}...", copy_dir.display());
         let mut sp = Spinner::new(Spinners::Dots, msg);
 
         std::fs::create_dir_all(copy_dir.clone()).unwrap();
@@ -268,7 +272,7 @@ async fn main() {
 
     let mut sp = Spinner::new(
         Spinners::Dots,
-        "Syncing line endings with your system..".into(),
+        "Syncing line endings with your system...".into(),
     );
     installer::alloy::fix_line_endings(install_dir.clone().unwrap());
     sp.stop_with_message("Synced line endings!".into());
@@ -277,7 +281,7 @@ async fn main() {
     installer::alloy::patch_daisy_with_alloy(install_dir.clone().unwrap()).await;
     println!("Successfully patched!");
     
-    println!("Writing metadata to make future updating easier..");
+    println!("Writing metadata to make future updating easier...");
     installer::metadata::write_metadata(install_dir.clone().unwrap());
     println!("Done!");
     
