@@ -138,7 +138,7 @@ async fn main() {
 
     println!("");
     println!("One last thing: I need a decompiled daisyMoon folder.");
-    println!("You can either decompile it yourself, or you can download it from the Cobalt Archive");
+    println!("You can either decompile it yourself, or you can download it from the Cobalt Archive:");
     println!("(https://drive.google.com/drive/folders/1jasI5F9X8kWauTzx3fT-qy6_aMJZx_fi)");
     println!("");
     println!(
