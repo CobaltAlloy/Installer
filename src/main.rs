@@ -39,7 +39,7 @@ async fn main() {
     }
 
     if cobalt_dir.is_none() {
-        let prompt = "Please enter your Cobalt game folder path";
+        let prompt = "Please enter your Cobalt game folder path:";
 
         let path = inquire::Text::new(prompt)
             .with_validator(InquireGamePathValidator {})
@@ -51,7 +51,7 @@ async fn main() {
 
     println!("");
     println!(
-        "It is {} recommended to create a new copy of Cobalt for Alloy.",
+        "It is {} recommended you create a new copy of Cobalt for Alloy.",
         "highly".italic()
     );
     println!("Installing to your main copy might break your game");
@@ -74,7 +74,7 @@ async fn main() {
     let mut install_dir: Option<PathBuf> = None;
 
     if !create_new_copy {
-        println!("Okay, if you say so..");
+        println!("Okay, if you say so...");
         install_dir = cobalt_dir.clone();
     }
 
@@ -115,7 +115,7 @@ async fn main() {
                 .into();
         }
 
-        let msg = format!("Creating a new copy of Cobalt at {}..", copy_dir.display());
+        let msg = format!("Creating a new copy of Cobalt at {}...", copy_dir.display());
         let mut sp = Spinner::new(Spinners::Dots, msg);
 
         std::fs::create_dir_all(copy_dir.clone()).unwrap();
@@ -129,7 +129,7 @@ async fn main() {
         fs_extra::dir::copy(cobalt_dir.clone().unwrap(), copy_dir.clone(), &options).unwrap();
 
         sp.stop_with_message(format!(
-            "Created new copy of cobalt at {}!",
+            "Created new copy of Cobalt at {}!",
             copy_dir.display()
         ));
 
@@ -137,8 +137,8 @@ async fn main() {
     } 
 
     println!("");
-    println!("One last thing, I need a decompiled daisyMoon folder.");
-    println!("You can either decompile it yourself or you can download it from the Cobalt Archive");
+    println!("One last thing: I need a decompiled daisyMoon folder.");
+    println!("You can either decompile it yourself, or you can download it from the Cobalt Archive:");
     println!("(https://drive.google.com/drive/folders/1jasI5F9X8kWauTzx3fT-qy6_aMJZx_fi)");
     println!("");
     println!(
@@ -166,7 +166,7 @@ async fn main() {
                 continue;
             }
 
-            let mut sp = Spinner::new(Spinners::Dots, "Creating daisyMoon folder..".into());
+            let mut sp = Spinner::new(Spinners::Dots, "Creating daisyMoon folder...".into());
 
             let daisy_path = install_dir.clone().unwrap().join("daisyMoon");
 
@@ -186,11 +186,11 @@ async fn main() {
             daisymoon_folder_path = Some(daisy_path);
         } else if let Some(extension) = path.extension() {
             if extension != "zip" {
-                println!("That path is not a folder or zip, please try again.");
+                println!("That path is not a folder or zip; please try again.");
                 continue;
             }
 
-            let mut sp = Spinner::new(Spinners::Dots, "Creating daisyMoon folder..".into());
+            let mut sp = Spinner::new(Spinners::Dots, "Creating daisyMoon folder...".into());
 
             let bytes = std::fs::read(path).unwrap();
 
@@ -227,12 +227,12 @@ async fn main() {
         }
     }
 
-    println!("Installing to {}..", install_dir.clone().unwrap().display());
+    println!("Installing to {}...", install_dir.clone().unwrap().display());
 
     installer::steam::create_app_id_txt(install_dir.clone().unwrap()).await;
     println!("Created appid!");
 
-    let mut sp = Spinner::new(Spinners::Dots, "Downloading Aloy..".into());
+    let mut sp = Spinner::new(Spinners::Dots, "Downloading Alloy...".into());
 
     if let Err(e) = std::fs::create_dir_all(install_dir.clone().unwrap().join(INSTALLER_FOLDER)) {
         println!("Failed to create installer file directory: {}", e);
@@ -251,9 +251,9 @@ async fn main() {
 
     cfg_if! {
         if #[cfg(target_os = "windows")] {
-            println!("Since you're running windows, I'll need to download patch.exe");
+            println!("Since you're running Windows, I'll need to download patch.exe");
 
-            let mut sp = Spinner::new(Spinners::Dots, "Downloading patch..".into());
+            let mut sp = Spinner::new(Spinners::Dots, "Downloading patch...".into());
 
             let patch_dl_result = installer::gnuwin32::get_win32_patch(install_dir.clone().unwrap()).await;
             if let Err(e) = patch_dl_result {
@@ -268,7 +268,7 @@ async fn main() {
 
     let mut sp = Spinner::new(
         Spinners::Dots,
-        "Syncing line endings with your system..".into(),
+        "Syncing line endings with your system...".into(),
     );
     installer::alloy::fix_line_endings(install_dir.clone().unwrap());
     sp.stop_with_message("Synced line endings!".into());
@@ -277,7 +277,7 @@ async fn main() {
     installer::alloy::patch_daisy_with_alloy(install_dir.clone().unwrap()).await;
     println!("Successfully patched!");
     
-    println!("Writing metadata to make future updating easier..");
+    println!("Writing metadata to make future updating easier...");
     installer::metadata::write_metadata(install_dir.clone().unwrap());
     println!("Done!");
     

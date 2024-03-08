@@ -113,15 +113,15 @@ Hunk #1 FAILED at 1.
             println!("stdout: {}", stdout);
             println!("stderr: {}", stderr);
             println!(
-                "Patch failed because of different line endings, even though we've converted them"
+                "Patch failed because of different line endings, even though we've converted them."
             );
-            println!("Please open an issue on github.");
+            println!("Please open an issue on GitHub.");
             exit_or_windows(6);
         } else {
             println!("stdout: {}", stdout);
             println!("stderr: {}", stderr);
             println!("I'm not sure what went wrong");
-            println!("Please open an issue on github.");
+            println!("Please open an issue on GitHub.");
             exit_or_windows(7);
         }
     }
@@ -130,7 +130,7 @@ Hunk #1 FAILED at 1.
         println!("stdout: {}", stdout);
         println!("stderr: {}", stderr);
         println!("Patch command: {}", diff_command.clone());
-        println!("Patch catastrophically failed! Please open an issue on github.");
+        println!("Patch catastrophically failed! Please open an issue on GitHub.");
         exit_or_windows(5);
     }
 }
