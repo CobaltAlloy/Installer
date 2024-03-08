@@ -6,10 +6,6 @@ use std::fs::File;
 use std::io::Cursor;
 use std::path::PathBuf;
 
-//I'm not sure where to add this, but Windows builds don't have a .exe at the end. They run fine if you add it manually, however
-// std::env::consts::EXE_SUFFIX
-//Source: https://stackoverflow.com/questions/40917780/how-to-get-the-executable-extension-across-platforms-in-rust
-
 use crate::installer::inquire::FilePathCompleter;
 use crate::installer::inquire::InquireGamePathValidator;
 use crate::installer::inquire::InquirePathDoesntExistValidator;
