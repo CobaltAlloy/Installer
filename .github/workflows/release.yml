@@ -24,7 +24,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: target/release/alloy-installer.exe
-          asset_name: Installer_${{ github.ref }}_x64_64-pc-windows-msvc
+          asset_name: Installer_${{ github.ref }}_x64_64-pc-windows-msvc.exe
           tag: ${{ github.ref }}
 
   release-linux:
